@@ -8,4 +8,4 @@
       kind: Pod
     register: pod_list
   - debug:
-    msg: "{{ pod_list }}"
+      msg: "{{ pod_list }}"
