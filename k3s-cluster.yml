@@ -1,7 +1,7 @@
 ---
 - name: Provision K3S master node
   hosts: master_nodes
-  become: yes
+  become: true
 
   tasks:
   - name: Download k3s install script
@@ -9,7 +9,7 @@
       url: https://get.k3s.io
       dest: /tmp/k3s-install.sh
       mode: '0755'
-      
+
   - name: Install K3s
     shell: 'sh /tmp/k3s-install.sh'
 
@@ -20,7 +20,7 @@
 
 - name: Provision K3S Workers
   hosts: worker_nodes
-  become: yes
+  become: true
 
   tasks:
   - name: Read cluster master token
@@ -61,7 +61,7 @@
       src: /etc/rancher/k3s/k3s.yaml
       dest: /home/ubuntu/.kube/config
       flat: yes
-    become: yes
+    become: true
     become_user: root
 
   - name: Configure cluster connection
