@@ -1,4 +1,4 @@
-name: 'Terraform'
+name: 'Ansible'
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   ansible:
-    name: 'Terraform'
+    name: 'Ansible'
     runs-on: home-runner
     environment: production
     permissions:
@@ -27,7 +27,7 @@ jobs:
 
     - name: Deploy ansible on develop
       if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
-      run: ansible-playbook --vault-password-file ~/.vault_pass -i iac/development homelab-iac/run.yml
+      run: ansible-playbook --vault-password-file ~/.vault_pass -i ~/iac/development run.yml
     - name: Deploy ansible on production
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: ansible-playbook --vault-password-file ~/.vault_pass -i iac/production homelab-iac/run.yml
+      run: ansible-playbook --vault-password-file ~/.vault_pass -i ~/iac/production run.yml
