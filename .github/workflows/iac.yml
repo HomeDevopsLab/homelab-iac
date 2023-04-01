@@ -1,0 +1,32 @@
+name: 'Terraform'
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+
+permissions:
+  contents: read
+
+jobs:
+  ansible:
+    name: 'Terraform'
+    runs-on: home-runner
+    environment: production
+    permissions:
+      pull-requests: write
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Deploy ansible
+      if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+      run: ansible-playbook --vault-password-file ~/.vault_pass -i iac/development homelab-iac/run.yml
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: ansible-playbook --vault-password-file ~/.vault_pass -i iac/production homelab-iac/run.yml
