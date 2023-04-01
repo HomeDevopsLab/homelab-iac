@@ -25,8 +25,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Deploy ansible
+    - name: Deploy ansible on develop
       if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
       run: ansible-playbook --vault-password-file ~/.vault_pass -i iac/development homelab-iac/run.yml
+    - name: Deploy ansible on production
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: ansible-playbook --vault-password-file ~/.vault_pass -i iac/production homelab-iac/run.yml
