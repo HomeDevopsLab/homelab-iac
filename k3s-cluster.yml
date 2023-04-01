@@ -1,0 +1,72 @@
+---
+- name: Provision K3S master node
+  hosts: master_nodes
+  become: yes
+
+  tasks:
+  - name: Download k3s install script
+    get_url:
+      url: https://get.k3s.io
+      dest: /tmp/k3s-install.sh
+      mode: '0755'
+      
+  - name: Install K3s
+    shell: 'sh /tmp/k3s-install.sh'
+
+  - name: Install script cleanup
+    file:
+      path: /tmp/k3s-install.sh
+      state: absent
+
+- name: Provision K3S Workers
+  hosts: worker_nodes
+  become: yes
+
+  tasks:
+  - name: Read cluster master token
+    command: "cat /var/lib/rancher/k3s/server/node-token"
+    register: master_token
+    delegate_to: k3s_master
+
+  - name: Download k3s install script
+    get_url:
+      url: https://get.k3s.io
+      dest: /tmp/k3s-install.sh
+      mode: '0755'
+
+  - name: Install K3s
+    shell: 'sh /tmp/k3s-install.sh'
+    environment:
+      K3S_URL: "https://{{ hostvars['k3s_master'].ansible_host }}:6443"
+      K3S_TOKEN: "{{master_token.stdout}}"
+
+  - name: Install script cleanup
+    file:
+      path: /tmp/k3s-install.sh
+      state: absent
+
+- name: Download K3S config file
+  hosts: master_nodes
+
+  tasks:
+  - name: Create kube configuration dir
+    file:
+      path: /home/ubuntu/.kube
+      state: directory
+      owner: ubuntu
+    delegate_to: localhost
+
+  - name: Get cluster config
+    fetch:
+      src: /etc/rancher/k3s/k3s.yaml
+      dest: /home/ubuntu/.kube/config
+      flat: yes
+    become: yes
+    become_user: root
+
+  - name: Configure cluster connection
+    replace:
+      path: /home/ubuntu/.kube/config
+      regexp: '(\s+)server: https:\/\/127\.0\.0\.1:6443$'
+      replace: '\1server: https://{{ hostvars["k3s_master"].ansible_host }}:6443'
+    delegate_to: localhost
