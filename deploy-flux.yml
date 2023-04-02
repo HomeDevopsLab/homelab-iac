@@ -1,6 +1,7 @@
 ---
 - name: Create flux-system namespace
   hosts: localhost
+  gather_facts: false
 
   tasks:
   - name: Create namespace
@@ -9,3 +10,37 @@
       kind: Namespace
       name: flux-system
       state: present
+
+- name: Clone HomeLab Cluster Repo
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+  - name: Clone repo
+    git:
+      repo: https://github.com/HomeDevopsLab/homelab_cluster.git
+      dest: /tmp/homelab_cluster
+
+- name: Deploy flux
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    flux_obj_path: /tmp/homelab_cluster/clusters/raspberry/flux-system
+    flux_obj_list:
+      - gotk-components.yaml
+      - gotk-sync.yaml
+      - kustomization.yaml
+
+  tasks:
+  - name: Install flux-system objects
+    kubernetes.core.k8s:
+      src: "{{ flux_obj_path }}/{{ item }}"
+      state: present
+      apply: true
+    loop: "{{ flux_obj_list }}"
+  
+  - name: Install apps kustomization
+    kubernetes.core.k8s:
+      state: present
+      definition: "{{ lookup('file', '/tmp/homelab_cluster/clusters/raspberry/apps.yml') | from_yaml }}"
