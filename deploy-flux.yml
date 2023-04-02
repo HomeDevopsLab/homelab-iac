@@ -53,15 +53,15 @@
       state: present
       definition: "{{ lookup('file', '/tmp/homelab_cluster/clusters/raspberry/apps.yaml') | from_yaml }}"
   
-  - name: Decrypt {{ item }}
+  - name: "Decrypt {{ item }}"
     local_action: "shell {{ view_encrypted_file_cmd }} {{ item }}.enc > {{ item }}"
     changed_when: false
     loop: "{{ secrets }}"
 
-  - name: Deploy {{ item }}
+  - name: "Deploy {{ item }}"
     kubernetes.core.k8s:
       state: present
-      definition: "{{ lookup('file', {{ item }} ) | from_yaml }}"
+      definition: "{{ lookup('file', item) | from_yaml }}"
     loop: "{{ secrets }}"
 
   - name: Cleanup {{ item }}
