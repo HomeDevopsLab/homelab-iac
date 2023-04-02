@@ -1,5 +1,5 @@
 ---
 - name: Deploy Infrastructure
   import_playbook: k3s-cluster.yml
-- name: Get k8s nodes
-  import_playbook: deploy-flux.yml
+# - name: Get k8s nodes
+#   import_playbook: deploy-flux.yml
