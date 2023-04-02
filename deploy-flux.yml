@@ -47,4 +47,4 @@
   - name: Install apps kustomization
     kubernetes.core.k8s:
       state: present
-      definition: "{{ lookup('file', '/tmp/homelab_cluster/clusters/raspberry/apps.yml') | from_yaml }}"
+      definition: "{{ lookup('file', '/tmp/homelab_cluster/clusters/raspberry/apps.yaml') | from_yaml }}"
