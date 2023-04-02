@@ -1,0 +1,2 @@
+---
+view_encrypted_file_cmd: "ansible-vault view --vault-password-file ~/.vault_pass "

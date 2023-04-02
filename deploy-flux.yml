@@ -48,3 +48,12 @@
     kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('file', '/tmp/homelab_cluster/clusters/raspberry/apps.yaml') | from_yaml }}"
+  
+  - name: Decrypt flux-system secret
+    local_action: "shell {{ view_encrypted_file_cmd }} files/flux-secret.yaml.enc > /tmp/flux-secret.yaml"
+    changed_when: false
+  
+  - name: Deploy flux-system secret
+    kubernetes.core.k8s:
+      state: present
+      definition: "{{ lookup('file', '/tmp/flux-secret.yaml') | from_yaml }}"
