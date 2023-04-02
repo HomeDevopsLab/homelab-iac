@@ -31,6 +31,10 @@
       - gotk-components.yaml
       - gotk-sync.yaml
 
+    secrets:
+      - secrets/age-secret.yaml
+      - secrets/flux-secret.yaml
+
   tasks:
   - name: Install flux-system objects
     kubernetes.core.k8s:
@@ -49,11 +53,19 @@
       state: present
       definition: "{{ lookup('file', '/tmp/homelab_cluster/clusters/raspberry/apps.yaml') | from_yaml }}"
   
-  - name: Decrypt flux-system secret
-    local_action: "shell {{ view_encrypted_file_cmd }} files/flux-secret.yaml.enc > /tmp/flux-secret.yaml"
+  - name: Decrypt {{ item }}
+    local_action: "shell {{ view_encrypted_file_cmd }} {{ item }}.enc > secrets/{{ item }}"
     changed_when: false
-  
-  - name: Deploy flux-system secret
+    loop: "{{ secrets }}"
+
+  - name: Deploy {{ item }}
     kubernetes.core.k8s:
       state: present
-      definition: "{{ lookup('file', '/tmp/flux-secret.yaml') | from_yaml }}"
+      definition: "{{ lookup('file', secrets/{{ item }} ) | from_yaml }}"
+    loop: "{{ secrets }}"
+
+  - name: Cleanup {{ item }}
+    file:
+      path: "{{ item }}"
+      state: absent
+    loop: "{{ secrets }}"
