@@ -30,7 +30,6 @@
     flux_obj_list:
       - gotk-components.yaml
       - gotk-sync.yaml
-      - kustomization.yaml
 
   tasks:
   - name: Install flux-system objects
@@ -40,6 +39,11 @@
       apply: true
     loop: "{{ flux_obj_list }}"
   
+  - name: Install flux-system Kustomization
+    kubernetes.core.kustomize:
+      state: present
+      definition: "{{ lookup('file', '/tmp/homelab_cluster/clusters/raspberry/flux-system/kustomization.yml') | from_yaml }}"
+
   - name: Install apps kustomization
     kubernetes.core.k8s:
       state: present
