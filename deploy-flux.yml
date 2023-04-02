@@ -42,7 +42,7 @@
   - name: Install flux-system Kustomization
     kubernetes.core.k8s:
       state: present
-      definition: "{{ lookup('kubernetes.core.kustomize', '/tmp/homelab_cluster/clusters/raspberry/flux-system') }}"
+      definition: "{{ lookup('kubernetes.core.kustomize', dir='/tmp/homelab_cluster/clusters/raspberry/flux-system') }}"
 
   - name: Install apps kustomization
     kubernetes.core.k8s:
