@@ -47,6 +47,11 @@
     kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('kubernetes.core.kustomize', dir='/tmp/homelab_cluster/clusters/raspberry/flux-system') }}"
+  
+  - name: Install flux-system Image Update Automation
+    kubernetes.core.k8s:
+      state: present
+      definition: "{{ lookup('file', '/tmp/homelab_cluster/clusters/raspberry/flux-system-automation.yaml') | from_yaml }}"
 
   - name: Install apps kustomization
     kubernetes.core.k8s:
